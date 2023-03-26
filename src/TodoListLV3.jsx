@@ -1,12 +1,11 @@
 import { useState, useRef } from 'react';
-
 //輸入代辦事項
-const InputTodo = ( { setToDo } ) => {
+const InputTodo = ( { setTodo } ) => {
     const inputRef = useRef();
     const onSubmit = ( e ) => {
         e.preventDefault();
         const value = inputRef.current.value
-        setToDo( prv => {
+        setTodo( prv => {
             return [ ...prv, { id: crypto.randomUUID(), needTodo: value, checked: false } ]
         } )
     }
@@ -38,7 +37,7 @@ const ItemTab = ( { allTab, takeTab, setTakeTab } ) => {
 }
 
 //清單
-const ItemTabToggle = ( { todo, setToDo, tab } ) => {
+const ItemTabToggle = ( { todo, setTodo, tab } ) => {
     // console.log( tabTodo );
     let todo1 = []
     switch ( tab ) {
@@ -56,7 +55,7 @@ const ItemTabToggle = ( { todo, setToDo, tab } ) => {
         case "全部":
             return ( <>
                 {
-                    <TodoList todo={todo} setToDo={setToDo} />
+                    <TodoList todo={todo} setTodo={setTodo} />
                 }
             </> )
         default:
@@ -66,27 +65,29 @@ const ItemTabToggle = ( { todo, setToDo, tab } ) => {
     return (
         <>
             {
-                <TodoList todo={todo1} setToDo={setToDo} />
+                <TodoList todo={todo1} setTodo={setTodo} />
             }
         </>
     );
 }
 
 
-const TodoList = ( { todo, setToDo } ) => {
+const TodoList = ( { todo, setTodo } ) => {
     const handleChange = ( e ) => {
         const { value } = e.target;
         console.log( value );
         //代辦事項的checked的變動
-        setToDo( states => {
-            return states.map( ( state ) => {
-                const x = state.id.toString()
-                if ( x === value ) {
-                    state.checked = !state.checked;
-                }
-                return state;
-            } )
+        setTodo( states => states.map( ( state ) => {
+            const x = state.id.toString();
+            if ( x === value ) {
+                return {
+                    ...state,
+                    checked: !state.checked,
+                };
+            }
+            return state;
         } )
+        );
     };
     return (
         <>
@@ -98,11 +99,11 @@ const TodoList = ( { todo, setToDo } ) => {
                                 checked={item.checked} onChange={handleChange} />
                             <span>{item.needTodo}</span>
                         </label>
-                        <a><i className="fa fa-times" onClick={() => {
-                            console.log( ` ${i}  delete ${`"` + item.needTodo + `"`}` );
+                        <a ><i className="fa fa-times" onClick={() => {
+                            console.log( ` ${item.id}  delete ${`"` + item.needTodo + `"`}` );
                             const tempTodo = [ ...todo ];
                             tempTodo.splice( item.id, 1 )
-                            setToDo( prv => tempTodo );
+                            setTodo( prv => tempTodo );
                         }}></i></a>
                     </li> ) )}
         </>
@@ -120,13 +121,13 @@ const TodoListEmpty = ( { context } ) => {
 }
 
 // 統計
-const TodoCountClear = ( { todo, setToDo } ) => {
+const TodoCountClear = ( { todo, setTodo } ) => {
     return (
         <>
             <div className="todoList_statistics">
                 <p> {todo.filter( item => !item.checked ).length} 個待完成項目</p>
-                <a onClick={() => {
-                    setToDo( todo.filter( item => !item.checked ) );
+                <a href="#" onClick={() => {
+                    setTodo( todo.filter( item => !item.checked ) );
                 }
                 } >清除已完成項目</a>
             </div>
@@ -135,23 +136,25 @@ const TodoCountClear = ( { todo, setToDo } ) => {
 }
 
 const TodoListLV3 = () => {
-    const [ todo, setToDo ] = useState( [] ); //TODO內容
+    const [ todo, setTodo ] = useState( [] ); //TODO內容
     const allTab = [ "全部", "待完成", "已完成" ]; //分頁
     const [ takeTab, setTakeTab ] = useState( "全部" ); //分頁預設
 
     return (
         <>
+            {console.log( todo )}
+
             <div className="container todoListPage vhContainer">
                 <h1>LV3</h1>
                 <div className="todoList_Content">
-                    <InputTodo setToDo={setToDo} />
+                    <InputTodo setTodo={setTodo} />
                     <div className="todoList_list">
                         <ItemTab allTab={allTab} takeTab={takeTab} setTakeTab={setTakeTab} />
                         <div className="todoList_items">
                             <ul className="todoList_item" >
-                                {todo.length > 0 ? <ItemTabToggle todo={todo} setToDo={setToDo} tab={takeTab} /> : <TodoListEmpty context='目前無待辦事項' />}
+                                {todo.length > 0 ? <ItemTabToggle todo={todo} setTodo={setTodo} tab={takeTab} /> : <TodoListEmpty context='目前無待辦事項' />}
                             </ul >
-                            <TodoCountClear todo={todo} setToDo={setToDo} />
+                            <TodoCountClear todo={todo} setTodo={setTodo} />
                         </div>
                     </div>
                 </div>
@@ -159,5 +162,6 @@ const TodoListLV3 = () => {
         </>
     );
 }
+
 
 export default TodoListLV3;
